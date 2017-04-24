@@ -12,9 +12,10 @@ public class BouncingBalls extends ApplicationAdapter {
 	BallObject myBall;
 	int screenWidth, screenHeight;
 	ShapeRenderer myRenderer;
-	float ballRad = 7;
+	float ballRad = 7f;
 	private BallObject[] balls;
-	int numBalls;
+	int numBalls = 20;
+	float initSpeed = 1f;
 	
 	@Override
 	public void create () {
@@ -24,25 +25,17 @@ public class BouncingBalls extends ApplicationAdapter {
 		myRenderer = new ShapeRenderer();
 		balls = new BallObject[numBalls];
 		int ballRows =(int) Math.ceil(  Math.sqrt(numBalls)  );
+
 		for (int i = 0 ; i < numBalls ; i++){
 			balls[i] = new BallObject();
 			float initAngle = (float) (Math.random()*2*3.14159);
 			balls[i].vx = (float) ( initSpeed * Math.cos(initAngle));
+			balls[i].vy = (float) ( initSpeed * Math.cos(initAngle));
 			//etc for the other parameters
 // we're changing references of myBall to balls[i] so we can refer to each ball in the array.
-			balls[i].x= (0.5f+i/ballRows) * screenWidth/(ballRows);
-			balls[i].y= (0.5f+i% ballRows) * screenHeight/(ballRows);
+			balls[i].x = (0.5f+i/ballRows) * screenWidth/(ballRows);
+			balls[i].y = (0.5f+i% ballRows) * screenHeight/(ballRows);
 		}
-
-		myBall.x = (float) (Math.random()*screenWidth);
-		myBall.y = (float) (Math.random()*screenHeight);
-		float initSpeed = 1f;
-		float initAngle = (float) (Math.random()*2*3.14159);
-		myBall.vx = (float) ( initSpeed * Math.cos(initAngle));
-		myBall.vy = (float) ( initSpeed * Math.sin(initAngle));
-		myBall.redF = (float) Math.random();
-		myBall.greenF =(float) Math.random();
-		myBall.blueF = (float)Math.random();
 	}
 
 	@Override
@@ -52,38 +45,44 @@ public class BouncingBalls extends ApplicationAdapter {
 		myRenderer.begin(ShapeRenderer.ShapeType.Filled);
 		myRenderer.setColor(myBall.redF, myBall.greenF, myBall.blueF, 1);
 		myRenderer.circle(myBall.x, myBall.y, ballRad);
-		mover();
 		for(BallObject myBall: balls){
-			myRenderer.setColor(myBall.redF, myBall.greenF, myBall.blueF, 1);
+			myRenderer.setColor(256, 256, 256, 1);
 			myRenderer.circle(myBall.x, myBall.y, ballRad);
 		}
+		myRenderer.end();
+
+		mover();
+	}
+	private void mover(){
 		for(int i=0; i < numBalls;i++){
 			balls[i].x += balls[i].vx;
 			balls[i].y += balls[i].vy;
-
-// Hitting a wall
-			if(balls[i].x < ballRad)
-				balls[i].vx = Math.abs(balls[i].vx);
-			if(balls[i].y < ballRad)
-				balls[i].vy = Math.abs(balls[i].vy);
-			if(balls[i].x > screenWidth-ballRad)
-				balls[i].vx = -Math.abs(balls[i].vx);
-			if(balls[i].y > screenHeight-ballRad)
-				balls[i].vy = -Math.abs(balls[i].vy);
+			myBall.x += myBall.vx;
+			myBall.y += myBall.vy;
+			if(myBall.x < ballRad)
+				myBall.vx = Math.abs(myBall.vx);
+			if(myBall.y < ballRad)
+				myBall.vy = Math.abs(myBall.vy);
+			if(myBall.x > screenWidth-ballRad)
+				myBall.vx = -Math.abs(myBall.vx);
+			if(myBall.y > screenHeight-ballRad)
+				myBall.vy = -Math.abs(myBall.vy);
+			for(int j = i+1; j < numBalls; j++){
+				float dx = balls[i].x - balls[j].x;
+				float dy = balls[i].y - balls[j].y;
+				float distance = (float) Math.sqrt(dx*dx+dy*dy);
+				if (distance < 2 * ballRad) {
+					Vector2 dV = colliderator(i,j);
+					balls[i].vx -= dV.x;
+					balls[i].vy -= dV.y;
+					balls[j].vx += dV.x;
+					balls[j].vy += dV.y;
+					Vector2 newP = setBall2Rad(i, j );
+					balls[i].x = newP.x;
+					balls[i].y = newP.y;
+				}
+			}
 		}
-		myRenderer.end();
-	}
-	private void mover(){
-		myBall.x += myBall.vx;
-		myBall.y += myBall.vy;
-		if(myBall.x < ballRad)
-			myBall.vx = Math.abs(myBall.vx);
-		if(myBall.y < ballRad)
-			myBall.vy = Math.abs(myBall.vy);
-		if(myBall.x > screenWidth-ballRad)
-			myBall.vx = -Math.abs(myBall.vx);
-		if(myBall.y > screenHeight-ballRad)
-			myBall.vy = -Math.abs(myBall.vy);
 	}
 	private Vector2 colliderator(int i, int j){
 		Vector2 V1 = new Vector2(balls[i].vx, balls[i].vy);
