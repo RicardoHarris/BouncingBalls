@@ -9,17 +9,17 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 public class BouncingBalls extends ApplicationAdapter {
-	BallObject myBall;
+	//BallObject myBall;
 	int screenWidth, screenHeight;
 	ShapeRenderer myRenderer;
 	float ballRad = 7f;
 	private BallObject[] balls;
-	int numBalls = 20;
+	int numBalls = 1000;
 	float initSpeed = 1f;
 	
 	@Override
 	public void create () {
-		myBall = new BallObject();
+	//	myBall = new BallObject();
 		screenWidth = Gdx.graphics.getWidth();
 		screenHeight = Gdx.graphics.getHeight();
 		myRenderer = new ShapeRenderer();
@@ -35,6 +35,9 @@ public class BouncingBalls extends ApplicationAdapter {
 // we're changing references of myBall to balls[i] so we can refer to each ball in the array.
 			balls[i].x = (0.5f+i/ballRows) * screenWidth/(ballRows);
 			balls[i].y = (0.5f+i% ballRows) * screenHeight/(ballRows);
+			balls[i].redF = (float) Math.random();
+			balls[i].greenF = (float) Math.random();
+			balls[i].blueF = (float) Math.random();
 		}
 	}
 
@@ -43,10 +46,9 @@ public class BouncingBalls extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		myRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		myRenderer.setColor(myBall.redF, myBall.greenF, myBall.blueF, 1);
-		myRenderer.circle(myBall.x, myBall.y, ballRad);
+
 		for(BallObject myBall: balls){
-			myRenderer.setColor(256, 256, 256, 1);
+			myRenderer.setColor(myBall.redF, myBall.greenF, myBall.blueF, 1);
 			myRenderer.circle(myBall.x, myBall.y, ballRad);
 		}
 		myRenderer.end();
@@ -57,16 +59,14 @@ public class BouncingBalls extends ApplicationAdapter {
 		for(int i=0; i < numBalls;i++){
 			balls[i].x += balls[i].vx;
 			balls[i].y += balls[i].vy;
-			myBall.x += myBall.vx;
-			myBall.y += myBall.vy;
-			if(myBall.x < ballRad)
-				myBall.vx = Math.abs(myBall.vx);
-			if(myBall.y < ballRad)
-				myBall.vy = Math.abs(myBall.vy);
-			if(myBall.x > screenWidth-ballRad)
-				myBall.vx = -Math.abs(myBall.vx);
-			if(myBall.y > screenHeight-ballRad)
-				myBall.vy = -Math.abs(myBall.vy);
+			if(balls[i].x < ballRad)
+				balls[i].vx = Math.abs(balls[i].vx);
+			if(balls[i].y < ballRad)
+				balls[i].vy = Math.abs(balls[i].vy);
+			if(balls[i].x > screenWidth-ballRad)
+				balls[i].vx = -Math.abs(balls[i].vx);
+			if(balls[i].y > screenHeight-ballRad)
+				balls[i].vy = -Math.abs(balls[i].vy);
 			for(int j = i+1; j < numBalls; j++){
 				float dx = balls[i].x - balls[j].x;
 				float dy = balls[i].y - balls[j].y;
