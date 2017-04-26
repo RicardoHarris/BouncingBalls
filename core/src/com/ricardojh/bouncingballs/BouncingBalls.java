@@ -14,8 +14,8 @@ public class BouncingBalls extends ApplicationAdapter {
 	ShapeRenderer myRenderer;
 	float ballRad = 7f;
 	private BallObject[] balls;
-	int numBalls = 1000;
-	float initSpeed = 1f;
+	int numBalls = 100;
+	float initSpeed = 2f;
 	
 	@Override
 	public void create () {
@@ -104,6 +104,9 @@ public class BouncingBalls extends ApplicationAdapter {
 		Vector2 ballDiff = new Vector2(ball1.x-ball2.x, ball1.y-ball2.y);
 		ballDiff.setLength(2*ballRad+1);
 
+		balls[i].redF = (float) Math.random();
+		balls[i].greenF = (float) Math.random();
+		balls[i].blueF = (float) Math.random();
 		return ballDiff.add(ball2);
 	}
 }
